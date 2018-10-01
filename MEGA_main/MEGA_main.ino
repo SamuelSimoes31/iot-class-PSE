@@ -1,5 +1,6 @@
 #define PIR 3
-#define BUZ 2
+#define BUZ 8
+#define lamp 4
 
 volatile bool presUNO = true;
 volatile bool presMEGA = true;
@@ -12,8 +13,10 @@ String comandoRecebido;
 void setup() {
   Serial.begin(9600);
   Serial3.begin(9600);
-
+  
   pinMode(BUZ,OUTPUT);
+  pinMode(lamp,OUTPUT);
+  digitalWrite(lamp,HIGH);
   
   attachInterrupt(digitalPinToInterrupt(PIR), pirISR, CHANGE);
 }
@@ -24,6 +27,7 @@ void loop() {
   {
     if(presMEGA)  Serial3.write("PM1|"); //Presença Mega = true
     else          Serial3.write("PM0|"); //Presença Mega = false
+    presMEGA_anterior = presMEGA;
   }
 
   //recebendo mudança de estado do UNO
@@ -31,7 +35,8 @@ void loop() {
   {
     comandoRecebido = Serial3.readStringUntil('|');
     if( comandoRecebido == "PU1" )  presUNO = true;
-    if( comandoRecebido == "PU0" )  presUNO = false;
+    else if( comandoRecebido == "PU0" )  presUNO = false;
+    Serial.println(comandoRecebido);
   }
 
   if( !( presMEGA || presUNO ) ) //NAND (só dá 1 se as duas forem 0)
@@ -39,6 +44,10 @@ void loop() {
     iniciarDesligamento();
   }
 
+  Serial.print("presMEGA = ");
+  Serial.print(presMEGA);
+  Serial.print("   presUNO = ");
+  Serial.println(presUNO);
 }
 
 void pirISR()
@@ -48,10 +57,15 @@ void pirISR()
 
 void iniciarDesligamento()
 {
-  delay(300000); //esperar 5 minutos
+  Serial.println("Desligamento iniciado!");
+  //delay(300000); //esperar 5 minutos
+  delay(5000);
   beepAtivo(3, 1000, 500, BUZ);
-  delay(60000);
+  //delay(60000);
+  delay(1000);
   beepAtivo(1, 4000, 0, BUZ);
+  digitalWrite(lamp,LOW);
+  //Serial3.write("DAC|");
 }
 
 void beepAtivo(int beeps, int tempoON, int tempoOFF, int pin)
