@@ -2,7 +2,7 @@
 
 #define PIR 3
 
-volatile bool presUNO = true;
+volatile bool presUNO = false;
 volatile bool presMEGA = true;
 volatile bool presUNO_anterior = true; //estado anterior
 volatile bool presMEGA_anterior = true;//estado anteiror

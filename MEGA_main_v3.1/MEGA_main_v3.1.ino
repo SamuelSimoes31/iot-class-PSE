@@ -1,14 +1,25 @@
 #define debug true
+//-------TIMER-----------
+#include <Event.h>
+#include <Timer.h>
+int id1,id2,id3;
+Timer t;
+
+//-------INFRARED----------------
+#define LedIR 11
 
 #define PIR 3
 #define BUZ 8
 #define lamp 4
+#define tomadas 5
 
 volatile bool presUNO = false;
 volatile bool presMEGA = true;
 volatile bool presUNO_anterior = true; //estado anterior
 volatile bool presMEGA_anterior = true;//estado anteiror
-         bool estadoSala = true;
+         int estadoSala;
+
+enum estadosSala{LIGADA, DESLIGANDO, DESLIGADA};
 
 String comandoRecebido;
 
@@ -22,9 +33,14 @@ void setup() {
   digitalWrite(lamp,HIGH);
   presMEGA = digitalRead(PIR);
   attachInterrupt(digitalPinToInterrupt(PIR), pirISR, CHANGE);
+
+  pinMode(LedIR, OUTPUT); 
+  
 }
 
 void loop() {
+  t.update();
+  
   //se estado mudar, enviar isso para o UNO
   if(presMEGA != presMEGA_anterior)
   {
@@ -43,15 +59,26 @@ void loop() {
     Serial.println(comandoRecebido);
     #endif
   }
-  if( !( presMEGA || presUNO ) && estadoSala == 1 )
+
+  if( !( presMEGA || presUNO ) && estadoSala == LIGADA )
   {
+    estadoSala = DESLIGANDO;
+    Serial3.write("PM0|");
     iniciarDesligamento();
   }
-  else if(( presMEGA || presUNO ) && estadoSala == 0)
+  else if(( presMEGA || presUNO ) && estadoSala == DESLIGANDO)
   {
-    estadoSala = 1;
+      estadoSala = LIGADA;
+      t.stop(id1);
+      t.stop(id2);
+      t.stop(id3);
+  }
+  else if(( presMEGA || presUNO ) && estadoSala == DESLIGADA)
+  {
+    estadoSala = LIGADA;
     digitalWrite(lamp,HIGH);
   }
+  
   #ifdef debug
   Serial.print("presMEGA = ");
   Serial.print(presMEGA);
@@ -63,50 +90,5 @@ void loop() {
 void pirISR()
 {
   presMEGA = digitalRead(PIR);
-}
-
-void iniciarDesligamento()
-{
-  #ifdef debug
-  Serial.println("Desligamento iniciado!");
-  #endif
-  for(int i=1; i<=10+5; i++)
-  {
-    if( Serial3.available() )
-    {
-    comandoRecebido = Serial3.readStringUntil('|');
-    if( comandoRecebido == "PU1" )  presUNO = true;
-    else if( comandoRecebido == "PU0" )  presUNO = false;
-    #ifdef debug
-    Serial.println(comandoRecebido);
-    #endif
-    }
-    if(presMEGA || presUNO)
-    {
-      #ifdef debug
-      Serial.println("desligamento cancelado");
-      #endif
-      break;
-    }
-    if(i == 10) beepAtivo(5, 100, 200, BUZ);
-    if(i == 15)
-    {
-      beepAtivo(1, 1000, 0, BUZ);
-      digitalWrite(lamp,LOW);
-      estadoSala = 0;
-    }
-    delay(1000);
-  }
-}
-
-void beepAtivo(int beeps, int tempoON, int tempoOFF, int pin)
-{
-  for(int i=0; i<beeps; i++)
-  {
-    digitalWrite(pin,HIGH);
-    delay(tempoON);
-    digitalWrite(pin,LOW);
-    delay(tempoOFF);
-  }
 }
 
