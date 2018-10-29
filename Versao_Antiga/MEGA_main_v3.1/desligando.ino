@@ -25,7 +25,7 @@ void desligando2()
   beepAtivo(1, 1000, 0, BUZ);
   
   digitalWrite(lamp,LOW);
-  desligarAr();
+  //desligarAr(); NO UNO
   desligarProjetor();
   id3 = t.after(1000*30,desligarTomadas,1);
 }
