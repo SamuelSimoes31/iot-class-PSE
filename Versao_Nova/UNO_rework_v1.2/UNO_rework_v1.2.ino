@@ -1,13 +1,9 @@
 #define debug true
 
-//SERIAL
+//SERIAL + BLUETOOTH
 #include <SoftwareSerial.h>
 SoftwareSerial BTserial(4, 5); // RX | TX
-
-//BLUETOOTH
 String comandoRecebido;
-//#define BTstatusPIN 2
-//volatile bool BTstatus = false;
 
 //INFRAVERMELHO
 #define LedIR 13 //MUDAR PARA 11 DEPOIS
@@ -19,10 +15,9 @@ int valor_analogico;
 
 void setup(){
   #ifdef debug
-  Serial.begin(9600); //Para fins de debug
-  digitalWrite(LedIR,LOW);
+    Serial.begin(9600); //Para fins de debug
   #endif
-  
+  digitalWrite(LedIR,LOW);
   BTserial.begin(9600);
 }
 
@@ -35,10 +30,18 @@ void loop(){
   }
   
   valor_analogico = analogRead(pinMQ2);
-  if(valor_analogico > nivel) {BTserial.write("FOGO|");Serial.println("É FOGOOO");}
+  if(valor_analogico > nivel) 
+  {
+    BTserial.write("FOGO|");
+    #ifdef debug
+      Serial.println("É FOGOOO");
+    #endif
+  }
 
-  Serial.print("valor_analogico = ");
-  Serial.println(valor_analogico);
-  //delay(500);
+  #ifdef debug
+    Serial.print("valor_analogico = ");
+    Serial.println(valor_analogico);
+    //delay(500);
+  #endif
 }
 
