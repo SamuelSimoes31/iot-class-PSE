@@ -2,8 +2,8 @@
 
 //SAÍDAS
 #define BUZ 6
-#define lamp 11  //MUDAR PARA 4
-#define tomadas 10
+#define lamp 9
+#define tomadas 8
 
 //PIR
 #define PIR1 3
@@ -22,14 +22,14 @@ int id1,id2,id3; //IDs dos timers utilizados na aba "timers"
 Timer t; //o objeto Timer
 
 //BOTÃO
-#define botao 8 //pino do botão de adicionar mais tempo para desligar as bancadas
+#define botao 12 //pino do botão de adicionar mais tempo para desligar as bancadas
 bool flagBotao; //flag para identificar se o botão foi pressionado
 int TT=1;       //variável para incrementar o tempo para desligar as bancadas
 
 
 //SERIAL + BLUETOOTH
 #include <SoftwareSerial.h>
-SoftwareSerial BTserial(12, 11); // RX | TX
+SoftwareSerial BTserial(11, 10); // RX | TX
 String comandoRecebido;
 
 void setup() {

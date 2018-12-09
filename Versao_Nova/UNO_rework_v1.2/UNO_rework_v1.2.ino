@@ -2,11 +2,11 @@
 
 //SERIAL + BLUETOOTH
 #include <SoftwareSerial.h>
-SoftwareSerial BTserial(4, 5); // RX | TX
+SoftwareSerial BTserial(12, 11); // RX | TX
 String comandoRecebido;
 
 //INFRAVERMELHO
-#define LedIR 13 //MUDAR PARA 11 DEPOIS
+#define LedIR 11
 
 //MQ-2
 #define pinMQ2 A2
